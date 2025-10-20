@@ -18,12 +18,9 @@ provider = EngineLabsProvider()
 # --- FastAPI Lifespan 管理 ---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info(f"启动应用: {settings.APP_NAME} v{settings.APP_VERSION}")
-    logger.info("协议: 凤凰协议 (Project Phoenix) | v4.0 自主认证版")
-    logger.info("认证模式: 全自动令牌续期")
-    logger.info(f"服务将在 http://localhost:{settings.NGINX_PORT} 上可用")
+    logger.info(f"{settings.APP_NAME} v{settings.APP_VERSION} started")
     yield
-    logger.info("应用关闭。")
+    logger.info("Application shutdown")
 
 # --- FastAPI 应用实例 ---
 app = FastAPI(
@@ -45,12 +42,9 @@ async def verify_api_key(authorization: Optional[str] = Header(None)):
 # --- API 路由 ---
 @app.post("/v1/chat/completions", dependencies=[Depends(verify_api_key)])
 async def chat_completions(request: Request):
-    """
-    处理聊天补全请求。认证信息由服务全自动处理。
-    """
+    """Handle chat completion requests"""
     try:
         request_data = await request.json()
-        # 【调用简化】: 不再需要传递任何令牌
         return await provider.chat_completion(request_data)
 
     except HTTPException as e:
