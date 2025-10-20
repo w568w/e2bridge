@@ -55,19 +55,17 @@ CLERK_ORGANIZATION_ID=org_xxx
 1. 在浏览器中登录 [cto.new](https://cto.new)
 2. 打开开发者工具 (F12)
 3. 切换到 Network 标签
-4. 在页面中进行操作（如发送消息）
-5. 找到发往 `clerk.cto.new` 的请求
+4. 刷新页面
+5. 找到发往 `https://clerk.cto.new/v1/client/sessions/sess_XXX/tokens` 的请求
 
 **获取 CLERK_COOKIE:**
 - 在 Request Headers 中找到 `cookie` 字段，复制完整值
 
 **获取 CLERK_SESSION_ID:**
 - 在请求 URL 中查找类似 `sess_xxxxx` 的值
-- 或在 Cookie 中的 `__session` 字段解码后获取
 
 **获取 CLERK_ORGANIZATION_ID:**
 - 在请求 Payload 中查找 `organization_id` 字段
-- 或在响应的 JWT token 中的 `o.id` 字段获取
 
 ### 启动服务
 
