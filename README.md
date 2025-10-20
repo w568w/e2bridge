@@ -13,20 +13,30 @@
 
 ### 前置要求
 
-- Python 3.10+
+- Python 3.14+
 - 访问 cto.new 的网络环境
 
 ### 安装步骤
 
 1. 克隆项目
+
 ```bash
 git clone <repository-url>
 cd e2bridge
 ```
 
 2. 安装依赖
+
+使用 pip (推荐):
+
 ```bash
-pip install -r requirements.txt
+pip install .
+```
+
+或者开发模式安装:
+
+```bash
+pip install -e .
 ```
 
 3. 配置环境变量
@@ -63,10 +73,10 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 
 ## 项目结构
 
-```
+```text
 e2bridge/
 ├── main.py                 # FastAPI 主入口
-├── requirements.txt        # 依赖列表
+├── pyproject.toml         # 项目配置和依赖
 ├── .env.example           # 环境变量模板
 └── app/
     ├── core/

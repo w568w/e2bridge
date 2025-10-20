@@ -1,0 +1,14 @@
+[project]
+name = "e2bridge"
+version = "0.1.0"
+description = "E2(to) OpenAI API Bridge"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.119.0",
+    "httpx>=0.28.1",
+    "pydantic-settings>=2.11.0",
+    "python-dotenv>=1.1.1",
+    "uvicorn[standard]>=0.38.0",
+    "websockets>=15.0.1",
+]
