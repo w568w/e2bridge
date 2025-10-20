@@ -75,6 +75,12 @@ CLERK_ORGANIZATION_ID=org_xxx
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
+### 测试可用性
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d "{\"messages\": [{\"content\": \"hello\"}]}" http://127.0.0.1:8000/v1/chat/completions --output -
+```
+
 ## 使用
 
 在支持 OpenAI API 的客户端中配置：
@@ -82,29 +88,6 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 - API 地址: `http://your-server:8000`
 - API 密钥: 在 `.env` 中设置的 `API_MASTER_KEY`
 - 模型: cto.new 支持的模型（如 `ClaudeSonnet4_5`, `GPT5` 等）
-
-## 项目结构
-
-```text
-e2bridge/
-├── main.py                 # FastAPI 主入口
-├── pyproject.toml         # 项目配置和依赖
-├── .env.example           # 环境变量模板
-└── app/
-    ├── core/
-    │   └── config.py      # 配置管理
-    ├── providers/
-    │   ├── base_provider.py
-    │   └── enginelabs_provider.py  # cto.new API 交互
-    └── utils/
-        └── sse_utils.py   # SSE 工具函数
-```
-
-## 注意事项
-
-- 依赖 cto.new 和 Clerk 的接口稳定性
-- 需要手动获取 CLERK_COOKIE
-- 对话历史缓存基于内存，重启后丢失
 
 ## License
 
