@@ -45,17 +45,29 @@ pip install -e .
 
 ```env
 API_MASTER_KEY=your_api_key_here
-CLERK_COOKIE="your_clerk_cookie_here"
+CLERK_COOKIE=your_clerk_cookie_here
+CLERK_SESSION_ID=sess_xxx
+CLERK_ORGANIZATION_ID=org_xxx
 ```
 
-### 获取 CLERK_COOKIE
+### 获取 Clerk 认证信息
 
 1. 在浏览器中登录 [cto.new](https://cto.new)
 2. 打开开发者工具 (F12)
 3. 切换到 Network 标签
 4. 在页面中进行操作（如发送消息）
 5. 找到发往 `clerk.cto.new` 的请求
-6. 在 Request Headers 中复制 `cookie` 字段的值
+
+**获取 CLERK_COOKIE:**
+- 在 Request Headers 中找到 `cookie` 字段，复制完整值
+
+**获取 CLERK_SESSION_ID:**
+- 在请求 URL 中查找类似 `sess_xxxxx` 的值
+- 或在 Cookie 中的 `__session` 字段解码后获取
+
+**获取 CLERK_ORGANIZATION_ID:**
+- 在请求 Payload 中查找 `organization_id` 字段
+- 或在响应的 JWT token 中的 `o.id` 字段获取
 
 ### 启动服务
 

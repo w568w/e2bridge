@@ -23,14 +23,17 @@ class EngineLabsProvider(BaseProvider):
     def __init__(self):
         if not settings.CLERK_COOKIE:
             raise ValueError("CLERK_COOKIE must be set in .env file")
+        if not settings.CLERK_SESSION_ID:
+            raise ValueError("CLERK_SESSION_ID must be set in .env file")
+        if not settings.CLERK_ORGANIZATION_ID:
+            raise ValueError("CLERK_ORGANIZATION_ID must be set in .env file")
 
         self.client = httpx.AsyncClient()
         self.chat_url = "https://api.enginelabs.ai/engine-agent/chat"
 
         self.clerk_cookie = settings.CLERK_COOKIE.strip()
-
-        self.session_id = "sess_34CF6rxgHrvboCirm3k5sVJL2LF"
-        self.organization_id = "org_34CG0TGEYHYPPUEVC6xiY7qAFUO"
+        self.session_id = settings.CLERK_SESSION_ID.strip()
+        self.organization_id = settings.CLERK_ORGANIZATION_ID.strip()
 
         self.token_url = f"https://clerk.cto.new/v1/client/sessions/{self.session_id}/tokens?__clerk_api_version=2025-04-10"
 

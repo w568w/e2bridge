@@ -18,6 +18,8 @@ class Settings(BaseSettings):
 
     # --- Clerk Authentication ---
     CLERK_COOKIE: Optional[str] = None
+    CLERK_SESSION_ID: Optional[str] = None
+    CLERK_ORGANIZATION_ID: Optional[str] = None
 
     # --- Model Configuration ---
     DEFAULT_MODEL: str = "ClaudeSonnet4_5"
