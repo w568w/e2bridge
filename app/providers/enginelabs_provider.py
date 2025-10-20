@@ -2,8 +2,8 @@ import json
 import time
 import logging
 import uuid
-import jwt
-import cloudscraper
+import base64
+import httpx
 import websockets
 import hashlib
 from typing import Dict, Any, AsyncGenerator, Optional
@@ -24,7 +24,7 @@ class EngineLabsProvider(BaseProvider):
         if not settings.CLERK_COOKIE:
             raise ValueError("CLERK_COOKIE must be set in .env file")
 
-        self.scraper = cloudscraper.create_scraper()
+        self.client = httpx.AsyncClient()
         self.chat_url = "https://api.enginelabs.ai/engine-agent/chat"
 
         self.clerk_cookie = settings.CLERK_COOKIE.strip()
@@ -48,7 +48,7 @@ class EngineLabsProvider(BaseProvider):
         }
         form_data = { "organization_id": self.organization_id }
         try:
-            response = self.scraper.post(self.token_url, headers=headers, data=form_data)
+            response = await self.client.post(self.token_url, headers=headers, data=form_data)
             response.raise_for_status()
             data = response.json()
             new_jwt = data.get("jwt")
@@ -60,6 +60,21 @@ class EngineLabsProvider(BaseProvider):
             logger.error(f"Failed to get JWT token: {e}", exc_info=True)
             raise HTTPException(status_code=500, detail=f"Failed to get auth token from Clerk: {e}")
 
+    def _decode_jwt_payload(self, token: str) -> dict:
+        """Decode JWT payload without verification"""
+        try:
+            # JWT format: header.payload.signature
+            payload_part = token.split('.')[1]
+            # Add padding if needed
+            padding = 4 - len(payload_part) % 4
+            if padding != 4:
+                payload_part += '=' * padding
+            decoded = base64.urlsafe_b64decode(payload_part)
+            return json.loads(decoded)
+        except Exception as e:
+            logger.error(f"Failed to decode JWT: {e}")
+            return {}
+
     def _get_conversation_fingerprint(self, messages: list) -> str:
         if not messages:
             return "empty"
@@ -67,10 +82,9 @@ class EngineLabsProvider(BaseProvider):
         return hashlib.md5(history_str.encode('utf-8')).hexdigest()
 
     async def chat_completion(self, request_data: Dict[str, Any]) -> StreamingResponse:
-        
         jwt_token = await self._get_fresh_jwt()
-        user_id = jwt.decode(jwt_token, options={"verify_signature": False}).get("sub")
-        
+        user_id = self._decode_jwt_payload(jwt_token).get("sub")
+
         model = request_data.get("model", settings.DEFAULT_MODEL)
         messages = request_data.get("messages", [])
         
@@ -106,7 +120,12 @@ class EngineLabsProvider(BaseProvider):
                 }
 
                 logger.info(f"Sending request with chatHistoryId: {chat_history_id}")
-                trigger_response = self.scraper.post(self.chat_url, headers=headers, json=payload, allow_redirects=False)
+                trigger_response = await self.client.post(
+                    self.chat_url,
+                    headers=headers,
+                    json=payload,
+                    follow_redirects=False
+                )
 
                 trigger_response.raise_for_status()
                 logger.info(f"Request successful: {trigger_response.status_code}")
@@ -158,7 +177,7 @@ class EngineLabsProvider(BaseProvider):
         model_data = {
             "object": "list",
             "data": [
-                {"id": name, "object": "model", "created": int(time.time()), "owned_by": "lzA6"}
+                {"id": name, "object": "model", "created": int(time.time()), "owned_by": "e2bridge"}
                 for name in settings.KNOWN_MODELS
             ]
         }
